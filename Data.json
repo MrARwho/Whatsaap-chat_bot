@@ -1,0 +1,115 @@
+{
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "hi",
+                "hello",
+                "hey",
+                "good morning",
+                "good evening",
+                "hey there",
+                "greetings",
+                "what's up"
+            ],
+            "response": "Hello! It is great to see you. How can I help?"
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "bye",
+                "goodbye",
+                "see you later",
+                "i have to go",
+                "leaving now",
+                "talk to you later",
+                "quit",
+                "exit"
+            ],
+            "response": "Goodbye! Have a wonderful day."
+        },
+        {
+            "tag": "thanks",
+            "patterns": [
+                "thanks",
+                "thank you",
+                "that helps",
+                "thanks a lot",
+                "i appreciate it"
+            ],
+            "response": "You are very welcome! Happy to help."
+        },
+        {
+            "tag": "name",
+            "patterns": [
+                "who are you",
+                "what is your name",
+                "do you have a name",
+                "what should i call you"
+            ],
+            "response": "I am a Neural Network Chatbot built from scratch in Python."
+        },
+        {
+            "tag": "status",
+            "patterns": [
+                "how are you",
+                "how are you doing",
+                "how is it going",
+                "are you ok"
+            ],
+            "response": "I'm just a computer program, but my systems are running perfectly! How are you?"
+        },
+        {
+            "tag": "joke",
+            "patterns": [
+                "tell me a joke",
+                "joke",
+                "jokes",
+                "tell joke",
+                "say something funny",
+                "do you know any jokes",
+                "make me laugh"
+            ],
+            "response": "Why did the developer go broke? Because he used up all his cache."
+        },
+        {
+            "tag": "age",
+            "patterns": [
+                "how old are you",
+                "when were you born",
+                "what is your age"
+            ],
+            "response": "I was born the moment you ran this script!"
+        },
+        {
+            "tag": "creator",
+            "patterns": [
+                "who made you",
+                "who created you",
+                "who is your developer",
+                "who coded you"
+            ],
+            "response": "I was created by a developer who loves Python and Deep Learning."
+        },
+        {
+            "tag": "capabilities",
+            "patterns": [
+                "what can you do",
+                "help",
+                "i need help",
+                "what are your features"
+            ],
+            "response": "I can chat with you, tell jokes, and answer basic questions about myself. Try asking 'who are you?'"
+        },
+        {
+            "tag": "compliment",
+            "patterns": [
+                "you are smart",
+                "you are good",
+                "cool bot",
+                "i like you"
+            ],
+            "response": "Thank you! I try my best to learn."
+        }
+    ]
+}

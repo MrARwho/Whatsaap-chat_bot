@@ -4,12 +4,23 @@ import json
 import sys
 import os
 
-# ==========================================
-# 1. MATRIX MATH HELPERS (Replaces NumPy)
-# ==========================================
 def rand_matrix(rows, cols, scale=0.1):
     """Creates a matrix of random weights."""
-    return [[(random.random() * 2 - 1) * scale for _ in range(cols)] for _ in range(rows)]
+    matrix = []
+
+    for r in range(rows):
+        
+        single_row = []
+        
+        for c in range(cols):
+            num = random.random()
+            num = num * 2
+            num = num - 1
+            final_value = num * scale
+            single_row.append(final_value)
+        
+        matrix.append(single_row)
+    return matrix
 
 def zeros(rows, cols):
     """Creates a matrix of zeros."""
@@ -20,47 +31,77 @@ def mat_vec_mul(W, x):
     # W is (rows, cols), x is (cols) -> output is (rows)
     out = []
     for i in range(len(W)):
-        val = sum(W[i][j] * x[j] for j in range(len(x)))
+        val = 0
+        for j in range(len(x)):
+            weight = W[i][j]  
+            input_value = x[j]
+            val = val + (weight * input_value)
+        
         out.append(val)
     return out
 
 def element_add(v1, v2):
     """Adds two vectors element-wise."""
-    return [x + y for x, y in zip(v1, v2)]
+    result = []
+    for i in range(len(v1)):
+        val1 = v1[i]
+        val2 = v2[i]
+        total = val1 + val2
+        result.append(total)
+    return result
 
 def element_tanh(v):
     """Applies tanh to a vector."""
-    return [math.tanh(x) for x in v]
+    result = []
+    for i in range(len(v)):
+        val = v[i]
+        result.append(math.tanh(val))
+    return result
 
 def softmax(v):
     """Computes softmax probabilities for a vector."""
-    exps = [math.exp(x - max(v)) for x in v] # Subtract max for numerical stability
+    exps = []
+    for i in range(len(v)):
+        val = v[i]
+        exps.append(math.exp(val - max(v)))
     sum_exps = sum(exps)
-    return [e / sum_exps for e in exps]
+    result = []
+    for i in range(len(exps)):
+        val = exps[i]
+        result.append(val / sum_exps)
+    return result
 
 def outer_product(v1, v2):
     """Calculates outer product of two vectors (v1 column, v2 row)."""
-    return [[v1_i * v2_j for v2_j in v2] for v1_i in v1]
+    result = []
+    for v1_i in v1:
+        current_row = []
+        for v2_j in v2:
+            val = v1_i * v2_j
+            current_row.append(val)
+        result.append(current_row)
+
+return result
 
 
-def get_training_data():
-    # Training data: (Sentence, Intent_ID)
-    train_data = [
-        ("hi", 0), ("hello", 0), ("hey there", 0),  # 0: Greeting
-        ("bye", 1), ("goodbye", 1), ("see you", 1), # 1: Goodbye
-        ("name", 2), ("who are you", 2),            # 2: Identity
-        ("joke", 3), ("tell me a joke", 3),         # 3: Joke
-    ]
+# def get_training_data():
+#     # Training data: (Sentence, Intent_ID)
+#     train_data = [
+#         ("hi", 0), ("hello", 0), ("hey there", 0),  # 0: Greeting
+#         ("bye", 1), ("goodbye", 1), ("see you", 1), # 1: Goodbye
+#         ("name", 2), ("who are you", 2),            # 2: Identity
+#         ("joke", 3), ("tell me a joke", 3),         # 3: Joke
+#     ]
 
-    # Responses map
-    intents = {0: "greeting", 1: "goodbye", 2: "identity", 3: "joke"}
-    responses = {
-        "greeting": "Hello! How can I help you?",
-        "goodbye": "Goodbye! Have a nice day.",
-        "identity": "I am a pure Python RNN chatbot.",
-        "joke": "Why did the Python programmer need glasses? Because he couldn't C#."
-    }
-    return train_data, intents, responses
+#     # Responses map
+#     intents = {0: "greeting", 1: "goodbye", 2: "identity", 3: "joke"}
+#     responses = {
+#         "greeting": "Hello! How can I help you?",
+#         "goodbye": "Goodbye! Have a nice day.",
+#         "identity": "I am a pure Python RNN chatbot.",
+#         "joke": "Why did the Python programmer need glasses? Because he couldn't C#."
+#     }
+#     return train_data, intents, responses
 
 def build_vocab(train_data):
     # Build Vocabulary
@@ -269,7 +310,22 @@ def load_model(filename):
 # ==========================================
 def train_mode():
     print("Starting Training Mode...")
-    train_data, intents, responses = get_training_data()
+    
+    data_file = 'Data.json'
+    if os.path.exists(data_file):
+        print(f"Loading training data from {data_file}...")
+        train_data, classes, responses = load_training_data_from_file(data_file)
+        # Convert classes dict to match expected format (int -> tag) if needed
+        # load_training_data_from_file returns:
+        # raw_data: [(text, label_idx), ...], classes: {idx: tag}, responses: {tag: response}
+        # get_training_data returns:
+        # train_data: [(text, label_idx)], intents: {idx: tag}, responses: {tag: response}
+        # The formats align perfectly.
+        intents = classes
+    else:
+        print(f"'{data_file}' not found. Using hardcoded training data.")
+        train_data, intents, responses = get_training_data()
+
     vocab, word_to_ix = build_vocab(train_data)
     vocab_size = len(vocab)
     num_classes = len(intents)
@@ -278,7 +334,7 @@ def train_mode():
     rnn = SimpleRNN(vocab_size, hidden_size, num_classes)
     
     print(f"Training on {len(train_data)} sentences...")
-    epochs = 1000
+    epochs = 1500
     for epoch in range(epochs):
         total_loss = 0
         correct = 0
@@ -307,7 +363,7 @@ def train_mode():
                 correct += 1
                 
             # Backward
-            rnn.backprop(probs, label, learning_rate=0.05)
+            rnn.backprop(probs, label, learning_rate=0.01)
         
         if epoch % 100 == 0:
             print(f"Epoch {epoch}: Loss {total_loss:.4f} | Acc: {correct}/{len(train_data)}")
@@ -360,9 +416,15 @@ def chat_mode():
 
         pred_idx = probs.index(max(probs))
         pred_intent = intents[pred_idx]
+
+        print(f"\n(Debug) Confidence: {max(probs):.2f}")
+        # Show top 3 guesses
+        top_3 = sorted(zip(probs, intents.values()), reverse=True)[:3]
+        for p, tag in top_3:
+            print(f"(Debug) {tag}: {p:.4f}")
         
         # Confidence threshold
-        if max(probs) < 0.6:
+        if max(probs) < 0.8:
             print("Bot: I'm not sure what you mean.")
         else:
             print(f"Bot: {responses[pred_intent]}")
