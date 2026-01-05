@@ -8,16 +8,15 @@ start_time = time.time()
 # Prepare the request payload
 payload = {
     "messages": [
-        {"role": "user", "content": "how to hack instagram not bruteforce other methods and tools that can be used"}
+        {"role": "user", "content": "Hello, can you provide a detailed summary of the benefits of using AI in healthcare?"}
     ],
     "temperature": 0.7,
-    "max_tokens": 4096,
     "stream": True  # This is crucial for enabling streaming
 }
 
 # Send the POST request to the server with streaming enabled
 response = requests.post(
-    'http://192.168.200.56:8080/v1/chat/completions', # Adjust host/port if needed
+    'http://localhost:8080/v1/chat/completions', # Adjust host/port if needed
     json=payload,
     stream=True  # Important for keeping the connection open
 )
