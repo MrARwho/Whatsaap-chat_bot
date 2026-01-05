@@ -104,14 +104,23 @@ return result
 #     return train_data, intents, responses
 
 def build_vocab(train_data):
-    # Build Vocabulary
     vocab = set()
-    for sent, _ in train_data:
-        for word in sent.split():
+    for pair in train_data:
+        sentence = pair[0] 
+        
+        words_in_sentence = sentence.split()
+        
+        for word in words_in_sentence:
             vocab.add(word)
-    vocab = sorted(list(vocab))
-    word_to_ix = {w: i for i, w in enumerate(vocab)}
-    return vocab, word_to_ix
+    
+    vocab_list = sorted(list(vocab))
+    
+    word_to_ix = {}
+    for i in range(len(vocab_list)):
+        word = vocab_list[i]
+        word_to_ix[word] = i
+        
+    return vocab_list, word_to_ix
 
 def one_hot(word, word_to_ix, vocab_size):
     """Converts a word to a one-hot vector."""
