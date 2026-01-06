@@ -24,6 +24,12 @@ Key features:
 ### Prerequisites
 *   Python 3.x
 
+### Setup
+*   Clone the repository
+*   cd into the repository
+*   Run `python RNN_chatbot.py train` to train the model
+*   Run `python RNN_chatbot.py` to start the chatbot
+
 ### 1. Training the Model
 Before you can chat with the bot, you need to train it. The training process loads data from `Data.json`, trains the RNN for a fixed number of epochs, and saves the model weights to `model.json`.
 
