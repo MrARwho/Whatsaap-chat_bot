@@ -5,7 +5,6 @@ import sys
 import os
 
 def rand_matrix(rows, cols, scale=0.1):
-    """Creates a matrix of random weights."""
     matrix = []
 
     for r in range(rows):
@@ -23,12 +22,9 @@ def rand_matrix(rows, cols, scale=0.1):
     return matrix
 
 def zeros(rows, cols):
-    """Creates a matrix of zeros."""
     return [[0.0 for _ in range(cols)] for _ in range(rows)]
 
 def mat_vec_mul(W, x):
-    """Multiplies matrix W by vector x."""
-    # W is (rows, cols), x is (cols) -> output is (rows)
     out = []
     for i in range(len(W)):
         val = 0
@@ -41,7 +37,6 @@ def mat_vec_mul(W, x):
     return out
 
 def element_add(v1, v2):
-    """Adds two vectors element-wise."""
     result = []
     for i in range(len(v1)):
         val1 = v1[i]
@@ -51,7 +46,6 @@ def element_add(v1, v2):
     return result
 
 def element_tanh(v):
-    """Applies tanh to a vector."""
     result = []
     for i in range(len(v)):
         val = v[i]
@@ -59,7 +53,6 @@ def element_tanh(v):
     return result
 
 def softmax(v):
-    """Computes softmax probabilities for a vector."""
     exps = []
     for i in range(len(v)):
         val = v[i]
@@ -72,7 +65,6 @@ def softmax(v):
     return result
 
 def outer_product(v1, v2):
-    """Calculates outer product of two vectors (v1 column, v2 row)."""
     result = []
     for v1_i in v1:
         current_row = []
@@ -81,7 +73,7 @@ def outer_product(v1, v2):
             current_row.append(val)
         result.append(current_row)
 
-return result
+    return result
 
 
 # def get_training_data():
@@ -123,20 +115,15 @@ def build_vocab(train_data):
     return vocab_list, word_to_ix
 
 def one_hot(word, word_to_ix, vocab_size):
-    """Converts a word to a one-hot vector."""
     vec = [0] * vocab_size
     if word in word_to_ix:
         vec[word_to_ix[word]] = 1
-    return vec
+    return vec 
 
-# ==========================================
-# 3. RNN MODEL FROM SCRATCH
-# ==========================================
 class SimpleRNN:
     def __init__(self, input_size, hidden_size, output_size):
         self.hidden_size = hidden_size
         
-        # Initialize Weights (Xavier-like initialization)
         # Wxh: Input -> Hidden
         self.Wxh = rand_matrix(hidden_size, input_size)
         # Whh: Hidden -> Hidden
@@ -153,11 +140,10 @@ class SimpleRNN:
         inputs: list of one-hot vectors (one for each word in sentence)
         Returns: output probabilities, list of hidden states
         """
-        h = [0] * self.hidden_size # Initial hidden state
+        h = [0] * self.hidden_size 
         self.last_inputs = inputs
-        self.hs = { -1: h } # Dictionary to store hidden states for BPTT
+        self.hs = { -1: h } 
 
-        # Loop through time steps (words)
         for t, x in enumerate(inputs):
             # h[t] = tanh(Wxh * x + Whh * h[t-1] + bh)
             term1 = mat_vec_mul(self.Wxh, x)
@@ -165,16 +151,12 @@ class SimpleRNN:
             combined = element_add(element_add(term1, term2), self.bh)
             self.hs[t] = element_tanh(combined)
 
-        # Output computed only at the last step (Many-to-One)
         last_h = self.hs[len(inputs) - 1]
         logits = element_add(mat_vec_mul(self.Why, last_h), self.by)
         probs = softmax(logits)
         return probs, self.hs
 
     def backprop(self, probs, target_class, learning_rate=0.1):
-        """Calculates gradients and updates weights."""
-        # 1. Calculate Output Error (dy)
-        # Gradient of Cross-Entropy Loss w.r.t Softmax input is simply (prob - 1) for the correct class
         dy = list(probs)
         dy[target_class] -= 1
         
